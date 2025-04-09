@@ -1,7 +1,10 @@
+using App_Link_short.Client.Interfaces;
 using App_Link_short.Client.Pages;
 using App_Link_short.Components;
 using App_Link_short.Components.Account;
 using App_Link_short.Data;
+using App_Link_short.Endpoints;
+using App_Link_short.Services;
 
 
 namespace App_Link_short
@@ -30,7 +33,7 @@ namespace App_Link_short
                 .AddIdentityCookies();
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -40,6 +43,8 @@ namespace App_Link_short
                 .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+            builder.Services.AddTransient<IShortCodeGeneratorService, ShortCodeGeneratorService>();
+            builder.Services.AddTransient<ILinkService, LinkService>();
 
             var app = builder.Build();
 
@@ -68,6 +73,8 @@ namespace App_Link_short
 
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();
+            app.MapFallbackToFile("index.html");
+            app.MapLinkEndpoints();
 
             app.Run();
         }

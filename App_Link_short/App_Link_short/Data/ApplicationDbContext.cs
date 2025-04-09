@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace App_Link_short.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
