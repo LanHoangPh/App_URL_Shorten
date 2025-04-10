@@ -1,0 +1,6 @@
+@App_Link_short.Public_HostAddress = http://localhost:5202
+
+GET {{App_Link_short.Public_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
