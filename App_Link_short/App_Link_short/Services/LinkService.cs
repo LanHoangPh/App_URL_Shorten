@@ -59,4 +59,42 @@ public class LinkService : ILinkService
         }).ToArrayAsync();
         return new PagedResult<LinkDto>(links, totalCount);
     }
+
+    public async Task<LinkDto?> UpdateLinkAsync(LinkEditDto dto)
+    {
+        await using var db = _dbContextFactory.CreateDbContext();
+        var link = await db.Links
+            .FirstOrDefaultAsync(l=>l.Id == dto.Id && l.UserId == dto.UserId);
+        if (link is null)
+        {
+            return null;
+        }
+        link.LongUrl = dto.LongUrl;
+        link.IsActive = dto.IsActive;
+        db.Links.Update(link);
+        await db.SaveChangesAsync();
+        return new LinkDto
+        {
+            Id = link.Id,
+            LongUrl = link.LongUrl,
+            IsActive = link.IsActive,
+            ShortUrl = link.ShortUrl,
+        };
+    }
+
+    public async Task DeleteLinkAsync(long id, string userId)
+    {
+        await using var db = _dbContextFactory.CreateDbContext();
+        var link = db.Links
+            .Include(l => l.LinkAnalythics)
+            .FirstOrDefault(l => l.Id == id && l.UserId == userId);
+        if (link is null)
+        {
+            return;
+        }
+        if (link.LinkAnalythics.Count > 0)
+            db.LinkAnalythics.RemoveRange(link.LinkAnalythics);
+        db.Links.Remove(link);
+        await db.SaveChangesAsync();
+    }
 }

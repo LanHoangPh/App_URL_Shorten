@@ -17,6 +17,10 @@
     </div>
     <hr/>
 </div>
+@if (_showToast)
+{
+    <Toast Text="Link Copied!" OnClose="() =>_showToast=false" TimeoutInMiliseconds="500"/>
+}
 @if (_isLoading)
 {
     <Loader/>
@@ -63,10 +67,10 @@ else
                             </a>
                         </div>
                         <div class="col-sm-3 d-flex flex-column justify-content-center align-items-center link-stats">
-                            <button type="button" class="btn btn-sm btn-outline-dark">
+                            <button type="button" class="btn btn-sm btn-outline-dark" @onclick="() => _editlink = context">
                                 <i class="bx bx-edit me-1"></i> <span>Edit</span>
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger">
+                            <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => _deleteConfirmationLink = context">
                                 <i class="bx bx-edit me-1"></i> <span>Delete</span>
                             </button>
                         </div>
@@ -77,10 +81,32 @@ else
         <Paginator State="_paginationState"/>
     </div>
 }
+@if (_editlink is not null)
+{
+    <EditLinkModal Link="_editlink" OnClose="() => _editlink = null"
+                   UserId="@_userId"
+                   OnSave="OnLinkSave"/>
+}
+@if (_deleteConfirmationLink is not null)
+{
+    <Modal Titile="Confirm Delete?" OnClose="() => _deleteConfirmationLink = null">
+        <ChildContent>
+            <p>Do you really want to delete this link ?</p>
+            <p> @_deleteConfirmationLink.ShortUrl <small>[@_deleteConfirmationLink.LongUrl]</small> </p>
+        </ChildContent>
+        <FooterContent>
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <button type="button" class="btn btn-secondary" @onclick="() => _deleteConfirmationLink = null">Close</button>
+                <button type="submit" class="btn btn-danger" @onclick="DeleteLinkAsync">Delete</button>
+            </div>
+        </FooterContent>
+    </Modal>
+}
 
 @code {
     private const int PageSize = 5;
     private bool _isLoading = false;
+    public bool _showToast;
     [CascadingParameter]
     public Task<AuthenticationState> AuthStateTask{ get; set; }
     // private LinkDto[] _links = [];
@@ -95,18 +121,22 @@ else
     public QuickGrid<LinkDto>? _quickGrid;
     private PaginationState _paginationState = new() { ItemsPerPage = PageSize };
 
+    private LinkDto? _editlink = null;
+    private string _userId;
+    private LinkDto? _deleteConfirmationLink = null;
+
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthStateTask;
-        var userId = authState.User.GetUserId()?? "";
+        var authState = await AuthStateTask; 
+        _userId = authState.User.GetUserId()?? "";
         try
         {
             _linksProvider = async request =>
             {
-                var (links, totalCount) = await LinkService.GetLinksByUserAsync(userId, request.StartIndex, request.Count ?? PageSize, _showActiveOnly);
+                var (links, totalCount) = await LinkService.GetLinksByUserAsync(_userId, request.StartIndex, request.Count ?? PageSize, _showActiveOnly);
                 return GridItemsProviderResult.From(links, totalCount);
             };
-            Console.WriteLine($"Fetching links for UserId: {userId}");
+            Console.WriteLine($"Fetching links for UserId: {_userId}");
             await _paginationState.SetCurrentPageIndexAsync(0);
             StateHasChanged();
         }
@@ -142,7 +172,34 @@ else
     private async Task CopyToAsync(string linkUrl)
     {
         await JsRuntime.InvokeVoidAsync("window.copyToClipboard", linkUrl);
+        _showToast = true;
     }
+
+    private async void OnLinkSave(LinkDto updatelink)
+    {
+        _editlink.LongUrl = updatelink.LongUrl;
+        _editlink.IsActive = updatelink.IsActive;
+        _editlink = null;
+        if (_quickGrid is not null)
+        { 
+           await _quickGrid.RefreshDataAsync(); // Làm mới QuickGrid
+        }
+        StateHasChanged();
+    }
+
+    private async Task DeleteLinkAsync()
+    {
+        _isLoading = true;
+        await LinkService.DeleteLinkAsync(_deleteConfirmationLink.Id, _userId);
+        _deleteConfirmationLink = null;
+        _isLoading = false;
+        if (_quickGrid is not null)
+        { 
+            await _quickGrid.RefreshDataAsync(); // Làm mới QuickGrid
+        }
+        StateHasChanged();
+    }
+    
 
     enum ShowType
     {

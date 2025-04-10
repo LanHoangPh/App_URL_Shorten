@@ -1,0 +1,85 @@
+﻿@using System.ComponentModel.DataAnnotations
+@inject ILinkService LinkService
+<h3>EditLinkModal</h3>
+<EditForm Model="_model" OnValidSubmit="UpdateLinkAsync">
+    <DataAnnotationsValidator/>
+    <Modal Titile="Edit Link" OnClose="OnClose">
+        <ChildContent>
+            <div class="mb-3">
+                <label class="form-label">Short URL</label>
+                <input type="text" value="@Link.ShortUrl" class="form-control" readonly/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Long URL</label>
+                <InputText type="text" @bind-Value="_model.LongUrl" class="form-control" />
+                <ValidationMessage For="() => _model.LongUrl" />
+            </div>
+            <div class="mb-3 form-check">
+                <input id="is-active" type="checkbox" @bind="_model.IsActive" class="form-check-input"/>
+                <label for="is-active" class="form-label">Is Active</label>
+            </div>
+        </ChildContent>
+        <FooterContent>
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <button type="button" class="btn btn-secondary" @onclick="OnClose">Close</button>
+                <button type="submit" class="btn btn-main">Save Changes</button>
+            </div>
+        </FooterContent>
+
+    </Modal>
+</EditForm>
+@if (_isSaving)
+{
+    <Loader/>
+}
+@code {
+    [Parameter, EditorRequired]
+    public LinkDto? Link { get; set; }
+    [Parameter, EditorRequired]
+    public string? UserId { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback OnClose { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<LinkDto> OnSave { get; set; }
+    private EditMyLinkModel _model = new();
+    private bool _isSaving;
+
+    protected override void OnParametersSet()
+    {
+        _model = new()
+        {
+            IsActive = Link.IsActive,
+            LongUrl = Link.LongUrl
+        };
+        base.OnParametersSet();
+    }
+
+    private async Task UpdateLinkAsync()
+    {
+        try
+        {
+            _isSaving = true;
+            StateHasChanged(); // Cập nhật UI để disable nút
+            var linkEditDto = new LinkEditDto(Link.Id, _model.LongUrl, _model.IsActive, UserId);
+            var updatedLink = await LinkService.UpdateLinkAsync(linkEditDto);
+            updatedLink.TotalClicks = Link.TotalClicks;
+            _isSaving = false;
+            await OnSave.InvokeAsync(updatedLink);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating link: {ex.Message}");
+            _isSaving = false;
+            StateHasChanged();
+        }
+    }   
+
+    class EditMyLinkModel
+    {
+        [Required, Length(10, 250)] 
+        public string? LongUrl { get; set; }
+        public bool IsActive { get; set; }
+     
+    }
+}

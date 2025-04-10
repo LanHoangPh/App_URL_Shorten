@@ -45,7 +45,6 @@ a:hover{
 .invalid {
     outline: 1px solid #e50000;
 }
-
 .validation-message {
     color: #e50000;
 }
