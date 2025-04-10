@@ -1,8 +1,9 @@
-﻿global using System.Collections.Generic;
-global using System.Diagnostics;
+﻿global using System.Diagnostics;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.EntityFrameworkCore;
-global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using App_Link_short.Client.Interfaces;
 global using App_Link_short.Client.Services;
+global using App_Link_short.Data;
+global using App_Link_short.Client.DTOs;
+global using App_Link_short.Client.Extensions;

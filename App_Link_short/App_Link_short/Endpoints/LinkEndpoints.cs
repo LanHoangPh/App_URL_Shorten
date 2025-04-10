@@ -1,8 +1,4 @@
 using System.Security.Claims;
-using App_Link_short.Client.DTOs;
-using App_Link_short.Client.Extensions;
-using App_Link_short.Client.Interfaces;
-
 namespace App_Link_short.Endpoints;
 
 public static class LinkEndpoints
