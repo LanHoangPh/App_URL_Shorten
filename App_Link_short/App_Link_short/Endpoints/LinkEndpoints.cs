@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using App_Link_short.Client.DTOs;
 using App_Link_short.Client.Extensions;
 using App_Link_short.Client.Interfaces;
@@ -25,6 +25,7 @@ public static class LinkEndpoints
         {
             var userId = principal.GetUserId();
             var pageResult = await linkService.GetLinksByUserAsync(userId, startIndex, pageSize, activeOnly);
+            Console.WriteLine($"Server: StartIndex={startIndex}, PageSize={pageSize}, Links={pageResult.Record.Length}, TotalCount={pageResult.TotalCount}");
             return Results.Ok(pageResult);
         });
         

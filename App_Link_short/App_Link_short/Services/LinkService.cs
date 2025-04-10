@@ -1,4 +1,4 @@
-﻿using App_Link_short.Client.DTOs;
+using App_Link_short.Client.DTOs;
 using App_Link_short.Client.Interfaces;
 using App_Link_short.Data;
 namespace App_Link_short.Services;
@@ -49,7 +49,7 @@ public class LinkService : ILinkService
             query = query.Where(l => l.IsActive);
         }
         var totalCount = await query.CountAsync();
-        var links = await query.Skip(strartIndex * pageSize).Take(pageSize).Select(l=> new LinkDto
+        var links = await query.Skip(strartIndex).Take(pageSize).Select(l=> new LinkDto
         {
             Id = l.Id,
             LongUrl = l.LongUrl,

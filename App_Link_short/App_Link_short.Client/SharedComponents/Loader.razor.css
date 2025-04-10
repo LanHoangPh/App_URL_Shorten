@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿.fullscreen {
     position: fixed;
     top: 0;
@@ -7,4 +8,11 @@
 }
 .overlay {
     background-color: #6c757d;
+=======
+﻿namespace App_Link_short.Client.SharedComponents;
+
+public class Loader_razor_css
+{
+    
+>>>>>>> 2770d5919858d5d7bfcd69a053a428992bc286b4
 }

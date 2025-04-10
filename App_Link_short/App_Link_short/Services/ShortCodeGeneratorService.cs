@@ -1,4 +1,4 @@
-﻿using App_Link_short.Data;
+using App_Link_short.Data;
 
 namespace App_Link_short.Services;
 
