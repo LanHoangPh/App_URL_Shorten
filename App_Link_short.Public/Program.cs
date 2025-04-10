@@ -1,4 +1,3 @@
-
 using App_Link_short.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +9,6 @@ namespace App_Link_short.Public
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
-<<<<<<< HEAD
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
@@ -20,33 +17,21 @@ namespace App_Link_short.Public
             var app = builder.Build();
 
             app.UseHttpsRedirection();
-
-=======
-            builder.Services.AddControllers();
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddTransient<ILinkService, LinkService>();
-
-            var app = builder.Build();
-            
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
->>>>>>> 75dab7e92bb45ad2f443cccc7664f2d2bd114a5e
             app.MapGet("{shortCode}", async (string shortCode, ILinkService linkService) =>
             {
+                Console.WriteLine($"Received shortCode: {shortCode}");
                 var longUrl = await linkService.GetLongUrlByShortCodeAsync(shortCode);
                 if (string.IsNullOrEmpty(longUrl))
                 {
                     return Results.NotFound();
                 }
+                if (!Uri.TryCreate(longUrl, UriKind.Absolute, out var uriResult) ||
+                    (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
+                {
+                    Console.WriteLine($"Invalid URL: {longUrl}");
+                    return Results.BadRequest("Invalid URL");
+                }
+                Console.WriteLine($"Redirecting to: {longUrl}");
                 return Results.Redirect(longUrl);
             });
 

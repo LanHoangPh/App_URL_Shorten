@@ -8,4 +8,5 @@ public interface ILinkService
     Task<PagedResult<LinkDto>> GetLinksByUserAsync(string userId, int strartIndex, int pageSize, bool activeOnly);
     Task<LinkDto?> UpdateLinkAsync(LinkEditDto dto);
     Task DeleteLinkAsync(long id, string userId);
+    Task<LinkDetailsDto?> GetLinkAsync(long id, string userId);
 }

@@ -27,6 +27,7 @@ namespace App_Link_short.Public
             };
             _context.LinkAnalythics.Add(linkAnalytics);
             await _context.SaveChangesAsync();
+            Console.WriteLine($"Returning LongUrl: {link.LongUrl}");
             return link.LongUrl;
         }
     }

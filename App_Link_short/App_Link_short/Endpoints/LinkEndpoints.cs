@@ -20,7 +20,7 @@ public static class LinkEndpoints
         linksGroup.MapGet("", async (int startIndex, int pageSize, bool activeOnly, ILinkService linkService, ClaimsPrincipal principal) =>
         {
             var userId = principal.GetUserId();
-            var pageResult = await linkService.GetLinksByUserAsync(userId, startIndex, pageSize, activeOnly);
+            var pageResult = await linkService.GetLinksByUserAsync(userId!, startIndex, pageSize, activeOnly);
             Console.WriteLine($"Server: StartIndex={startIndex}, PageSize={pageSize}, Links={pageResult.Record.Length}, TotalCount={pageResult.TotalCount}");
             return Results.Ok(pageResult);
         });
@@ -44,8 +44,16 @@ public static class LinkEndpoints
             async (long linkId, ILinkService linkService, ClaimsPrincipal principal) =>
             {
                 var userId = principal.GetUserId();
-                await linkService.DeleteLinkAsync(linkId, userId);
+                await linkService.DeleteLinkAsync(linkId, userId!);
                 return Results.NoContent();
+            });
+        linksGroup.MapGet("/{linkId:long}",
+            async (long linkId, ILinkService linkService, ClaimsPrincipal principal) =>
+            {
+                var userId = principal.GetUserId();
+                var linkDeatilsDto = await linkService.GetLinkAsync(linkId, userId!);
+                if (linkDeatilsDto == null) return Results.NotFound(linkId);
+                return Results.Ok(linkDeatilsDto);
             });
         return app;
     }

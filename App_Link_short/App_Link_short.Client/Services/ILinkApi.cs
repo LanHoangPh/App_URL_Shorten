@@ -13,5 +13,8 @@ public interface ILinkApi
     Task<LinkDto?> UpdateLinkAsync(long linkId, LinkEditDto dto);
     [Delete("/api/link/{linkId}")]
     Task DeleteLinkAsync(long linkId);
-    
+    [Get("/api/link/{linkId}")]
+    Task<LinkDetailsDto?> GetLinkAsync(long linkId);
+
+
 }

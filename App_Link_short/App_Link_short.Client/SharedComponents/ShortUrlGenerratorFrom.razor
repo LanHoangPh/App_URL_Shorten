@@ -13,27 +13,27 @@
         </div>
         <div class="mb-3"></div>
         <button type="submit" class="btn btn-main" disabled="@_isProcessing">
-            @(_isProcessing ? "Shortening url...":"Shorten URL")
+            @(_isProcessing ? "Shortening url..." : "Shorten URL")
         </button>
     </EditForm>
 </div>
 @if (_isProcessing)
 {
-    <Loader/>
+    <Loader />
 }
 @if (!string.IsNullOrWhiteSpace(_shortUrl))
 {
-    <GeneratedLinkModal ShortUrl="@_shortUrl" OnClose="() => _shortUrl = null"/>
+    <GeneratedLinkModal ShortUrl="@_shortUrl" OnClose="() => _shortUrl = null" />
 }
-@code{
+@code {
     [CascadingParameter]
-    public Task<AuthenticationState> AuthStateTask{ get; set; }
+    public Task<AuthenticationState> AuthStateTask { get; set; }
 
     private ShortUrlGeneratorModel _model = new();
     private string? _shortUrl;
     private bool _isProcessing;
-    
-    
+
+
 
     private async Task ShortenUrlAsync()
     {
@@ -47,7 +47,7 @@
             return;
         }
 
-        var userId = authState.User.GetUserId(); // là dòng này
+        var userId = authState.User.GetUserId(); 
         var dto = new LinkCreateDto(_model.LongUrl, userId);
         var link = await LinkService.GenerateLinkAsync(dto);
         _isProcessing = false;

@@ -49,10 +49,10 @@ public class LinkService : ILinkService
         var links = await query.Skip(strartIndex).Take(pageSize).Select(l=> new LinkDto
         {
             Id = l.Id,
-            LongUrl = l.LongUrl,
+            LongUrl = l.LongUrl!,
             IsActive = l.IsActive,
-            ShortUrl = l.ShortUrl,
-            TotalClicks = l.LinkAnalythics.Count
+            ShortUrl = l.ShortUrl!,
+            TotalClicks = l.LinkAnalythics!.Count
         }).ToArrayAsync();
         return new PagedResult<LinkDto>(links, totalCount);
     }
@@ -75,7 +75,7 @@ public class LinkService : ILinkService
             Id = link.Id,
             LongUrl = link.LongUrl,
             IsActive = link.IsActive,
-            ShortUrl = link.ShortUrl,
+            ShortUrl = link.ShortUrl!,
         };
     }
 
@@ -89,9 +89,36 @@ public class LinkService : ILinkService
         {
             return;
         }
-        if (link.LinkAnalythics.Count > 0)
+        if (link.LinkAnalythics!.Count > 0)
             db.LinkAnalythics.RemoveRange(link.LinkAnalythics);
         db.Links.Remove(link);
         await db.SaveChangesAsync();
+    }
+
+    public async Task<LinkDetailsDto?> GetLinkAsync(long id, string userId)
+    {
+        await using var db = _dbContextFactory.CreateDbContext();
+        var link = await db.Links
+            .Include(l => l.LinkAnalythics)
+            .FirstOrDefaultAsync(l => l.Id == id && l.UserId == userId);
+        if (link is null) return null;
+
+        LinkAnalyticsDto[] linkAnalytics = (link.LinkAnalythics?
+            .Select(l => new LinkAnalyticsDto
+            {
+                Id = l.Id,
+                ClickedAt = l.ClickedAt,
+                LinkId = l.LinkId,
+            }).ToArray()) ?? [];
+
+        var LinkDto = new LinkDto
+        {
+            Id = id,
+            LongUrl = link.LongUrl!,
+            ShortUrl = link.ShortUrl!,
+            IsActive = link.IsActive,
+            TotalClicks = linkAnalytics.Length,
+        };
+        return new LinkDetailsDto(LinkDto, linkAnalytics);
     }
 }
