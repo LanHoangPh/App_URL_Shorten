@@ -13,4 +13,8 @@ public class LinkApiProxy : ILinkService
     }
 
     public Task<LinkDto> GenerateLinkAsync(LinkCreateDto dto) => _linkApi.CreateLinkAsync(dto);
+
+    public Task<PagedResult<LinkDto>>
+        GetLinksByUserAsync(string userId, int strartIndex, int pageSize, bool activeOnly) =>
+        _linkApi.GetLinksByUserAsync(strartIndex, pageSize, activeOnly);
 }

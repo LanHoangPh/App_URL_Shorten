@@ -1,6 +1,14 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="container-fluid bg-main text-white top-banner">&nbsp;</div>
+
+<AuthorizeView>
+    <Authorized>
+        <AffterLoginAction />
+    </Authorized>
+</AuthorizeView>
+<div class="container-fluid bg-main text-white top-banner">
+    &nbsp;
+</div>
 <div class="container mt-3">
     <div class="row mt-5 mb-2">
         <div class="col-11 mx-auto">

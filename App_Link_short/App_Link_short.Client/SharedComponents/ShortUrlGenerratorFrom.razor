@@ -1,14 +1,13 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@using App_Link_short.Client.Services
 @inject NavigationManager Navigation
 @inject ILinkService LinkService
+@inject SessionStorage SessionStorageService
 <div class="">
-    <EditForm Model="_model" OnValidSubmit="@ShortenUrlAsync" FormName="ShortUrlForm">
+    <EditForm Model="_model" OnValidSubmit="ShortenUrlAsync" FormName="ShortUrlForm">
         <DataAnnotationsValidator />
         <h2>Short a long URL</h2>
         <p>Enter/Paste a long URL</p>
         <div class="mb-3">
-            <label for="LongUrl">Long URL</label>
             <InputText @bind-Value="_model.LongUrl" class="form-control" placeholder="@("https://github.com/LanHoangPh")" />
             <ValidationMessage For="() => _model.LongUrl" class="text-danger" />
         </div>
@@ -22,11 +21,16 @@
 {
     <Loader/>
 }
+@if (!string.IsNullOrWhiteSpace(_shortUrl))
+{
+    <GeneratedLinkModal ShortUrl="@_shortUrl" OnClose="() => _shortUrl = null"/>
+}
 @code{
     [CascadingParameter]
     public Task<AuthenticationState> AuthStateTask{ get; set; }
 
     private ShortUrlGeneratorModel _model = new();
+    private string? _shortUrl;
     private bool _isProcessing;
     
     
@@ -37,7 +41,9 @@
         var authState = await AuthStateTask;
         if (authState.User.Identity is null || authState.User.Identity?.IsAuthenticated != true)
         {
-            Navigation.NavigateTo("/Account/Login");
+            // luu long url vao session
+            await SessionStorageService.SaveAsync(SessionStorage.LongUrlKey, _model.LongUrl);
+            Navigation.NavigateTo($"/Account/Login");
             return;
         }
 
@@ -45,6 +51,7 @@
         var dto = new LinkCreateDto(_model.LongUrl, userId);
         var link = await LinkService.GenerateLinkAsync(dto);
         _isProcessing = false;
+        _shortUrl = link.ShortUrl;
     }
     class ShortUrlGeneratorModel
     {

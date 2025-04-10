@@ -6,4 +6,5 @@ public class LinkDto
     public string LongUrl { get; set; }
     public string ShortUrl { get; set; }
     public bool IsActive { get; set; }
+    public int TotalClicks { get; set; }
 }

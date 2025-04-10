@@ -17,7 +17,7 @@
 <div class="row">
     <div class="col-sm-4 mx-auto border p-3">
         <StatusMessage Message="@errorMessage" />
-            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login" Enhance>
+            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="mb-3">

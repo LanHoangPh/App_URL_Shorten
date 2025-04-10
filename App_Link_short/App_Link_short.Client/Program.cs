@@ -21,6 +21,7 @@ namespace App_Link_short.Client
                 var apiUrl = builder.HostEnvironment.BaseAddress; 
                 client.BaseAddress = new Uri(apiUrl);
             } );
+            builder.Services.AddScoped<SessionStorage>();
 
             await builder.Build().RunAsync();
         }

@@ -1,12 +1,8 @@
-using App_Link_short.Client.Interfaces;
-using App_Link_short.Client.Pages;
 using App_Link_short.Components;
 using App_Link_short.Components.Account;
 using App_Link_short.Data;
 using App_Link_short.Endpoints;
 using App_Link_short.Services;
-
-
 namespace App_Link_short
 {
     public class Program
@@ -45,6 +41,7 @@ namespace App_Link_short
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
             builder.Services.AddTransient<IShortCodeGeneratorService, ShortCodeGeneratorService>();
             builder.Services.AddTransient<ILinkService, LinkService>();
+            builder.Services.AddScoped<SessionStorage>();
 
             var app = builder.Build();
 

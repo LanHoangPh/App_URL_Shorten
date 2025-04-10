@@ -1,0 +1,100 @@
+﻿/* Container cho danh sách liên kết */
+.links-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Mỗi mục liên kết */
+.link-item {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.link-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon và trạng thái */
+.link-item .bx {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.link-item .bx-check {
+    color: #28a745; /* Xanh lá cho active */
+}
+
+.link-item .bx-x {
+    color: #dc3545; /* Đỏ cho inactive */
+}
+
+/* Liên kết */
+.link-item a {
+    color: #007bff;
+    text-decoration: none;
+    word-break: break-all; /* Ngắt dòng nếu URL dài */
+}
+
+.link-item a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+/* Nút Copy, Edit, Delete */
+.btn-copy, .btn-edit, .btn-delete {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-copy {
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+}
+
+.btn-copy:hover {
+    background: #e9ecef;
+}
+
+.btn-edit {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.btn-edit:hover {
+    background: #6c757d;
+    color: #fff;
+}
+
+.btn-delete {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Total Clicks và View Details */
+.link-stats h5 {
+    margin: 0;
+    font-size: 1rem;
+    color: #495057;
+}
+@media (max-width: 576px) {
+    .link-item .col-sm-6, .link-item .col-sm-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .link-item .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

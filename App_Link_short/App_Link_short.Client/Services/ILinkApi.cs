@@ -7,4 +7,6 @@ public interface ILinkApi
 {
     [Post("/api/link")]
     Task<LinkDto> CreateLinkAsync(LinkCreateDto dto);
+    [Get("/api/links")]
+    Task<PagedResult<LinkDto>> GetLinksByUserAsync([Query]int strartIndex, int pageSize, bool activeOnly);
 }

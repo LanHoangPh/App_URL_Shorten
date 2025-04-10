@@ -23,7 +23,7 @@ public class LinkService : ILinkService
         {
             LongUrl = dto.LongUrl,
             UserId = dto.UserId,
-            ShortUrl = $"{domain.TrimEnd('/')} /{shortCode}", //Https://localhost:5000/{shortCode}
+            ShortUrl = $"{domain.TrimEnd('/')}/{shortCode}", //Https://localhost:5000/{shortCode}
             ShortCode = shortCode,
             IsActive = true
             
@@ -38,5 +38,25 @@ public class LinkService : ILinkService
             IsActive = true,
             ShortUrl = link.ShortUrl
         };
+    }
+    
+    public async Task<PagedResult<LinkDto>> GetLinksByUserAsync(string userId, int strartIndex, int pageSize, bool activeOnly)
+    {
+        await using var db = _dbContextFactory.CreateDbContext();
+        var query = db.Links.Where(l => l.UserId == userId);
+        if (activeOnly)
+        {
+            query = query.Where(l => l.IsActive);
+        }
+        var totalCount = await query.CountAsync();
+        var links = await query.Skip(strartIndex * pageSize).Take(pageSize).Select(l=> new LinkDto
+        {
+            Id = l.Id,
+            LongUrl = l.LongUrl,
+            IsActive = l.IsActive,
+            ShortUrl = l.ShortUrl,
+            TotalClicks = l.LinkAnalythics.Count
+        }).ToArrayAsync();
+        return new PagedResult<LinkDto>(links, totalCount);
     }
 }
